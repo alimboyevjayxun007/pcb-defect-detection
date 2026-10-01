@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: pcb_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pcb_user
+      POSTGRES_PASSWORD: pcb_password
+      POSTGRES_DB: pcb_defects
+    ports:
+      - "5432:5432"
+    volumes:
+      - pcb_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pcb_user -d pcb_defects"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      provenance: false
+      sbom: false
+    container_name: pcb_backend
+    restart: unless-stopped
+    environment:
+      ENV: development
+      DATABASE_URL: postgresql+asyncpg://pcb_user:pcb_password@db:5432/pcb_defects
+      MODEL_PATH: app/ml/best.pt
+      CONFIDENCE_THRESHOLD: 0.35
+      DEVICE: cpu
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app/ml:/app/app/ml
+      - backend_storage:/app/app/storage
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      provenance: false
+      sbom: false
+    container_name: pcb_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  pcb_db_data:
+  backend_storage:

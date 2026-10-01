@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+test.db
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Env
+.env
+.env.local
+
+# Storage (runtime fayllar)
+backend/app/storage/uploads/*
+backend/app/storage/results/*
+!backend/app/storage/uploads/.gitkeep
+!backend/app/storage/results/.gitkeep
+
+# Model vaznlari — best.pt ATAYLAB repo ichida saqlanadi (6MB, haqiqiy
+# train qilingan model — loyihaning asosiy natijasi). Faqat boshqa/vaqtinchalik
+# .pt fayllar (masalan, yolov8n.pt bazaviy vazn) e'tiborsiz qoldiriladi.
+backend/app/ml/*.onnx
+!backend/app/ml/best.pt
+!backend/app/ml/.gitkeep
+
+# Train jarayoni fayllari
+backend/training/runs/
+backend/training/*/images/
+backend/training/*/labels/
+backend/training/*.yaml
+!backend/training/README.md
+yolov8*.pt
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+*.tsbuildinfo
