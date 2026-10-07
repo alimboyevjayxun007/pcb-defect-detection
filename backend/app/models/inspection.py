@@ -33,9 +33,16 @@ class Inspection(Base):
     )
     image_path: Mapped[str] = mapped_column(String(500), nullable=True)
     mode: Mapped[InspectionMode] = mapped_column(
-        SAEnum(InspectionMode, name="inspection_mode"), default=InspectionMode.SINGLE
+        SAEnum(
+            InspectionMode,
+            name="inspection_mode",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        default=InspectionMode.SINGLE,
     )
-    verdict: Mapped[Verdict] = mapped_column(SAEnum(Verdict, name="verdict"))
+    verdict: Mapped[Verdict] = mapped_column(
+        SAEnum(Verdict, name="verdict", values_callable=lambda enum_cls: [e.value for e in enum_cls])
+    )
     inference_ms: Mapped[float] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
